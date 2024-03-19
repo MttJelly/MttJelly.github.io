@@ -477,6 +477,7 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <blockquote>
+</blockquote>
 <h2 id="LinearRegression代码顺序"><a href="#LinearRegression代码顺序" class="headerlink" title="LinearRegression代码顺序"></a>LinearRegression代码顺序</h2><ul>
 <li>Prepare dataset</li>
 <li>Design model using Class<ul>
@@ -492,8 +493,8 @@
 </ul>
 </li>
 </ul>
-<p><img src="./p1.png"></p>
-<h2 id="代码分析"><a href="#代码分析" class="headerlink" title="代码分析"></a>代码分析</h2><h3 id="Prepare-dataset"><a href="#Prepare-dataset" class="headerlink" title="Prepare dataset"></a>Prepare dataset</h3><p>python</p>
+<p>  <img src="./p1.png"></p>
+<h2 id="代码分析"><a href="#代码分析" class="headerlink" title="代码分析"></a>代码分析</h2><h3 id="Prepare-dataset"><a href="#Prepare-dataset" class="headerlink" title="Prepare dataset"></a>Prepare dataset</h3><p>  python</p>
 <pre class=" language-python"><code class="language-python">num_inputs<span class="token operator">=</span><span class="token number">2</span> <span class="token comment" spellcheck="true"># 两个特征数 </span>
 num_examples<span class="token operator">=</span><span class="token number">1000</span> <span class="token comment" spellcheck="true"># 1000个样本 </span>
 true_w<span class="token operator">=</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token operator">-</span><span class="token number">3.4</span><span class="token punctuation">]</span> <span class="token comment" spellcheck="true"># 两个权重 </span>
@@ -502,7 +503,7 @@ features<span class="token operator">=</span>torch<span class="token punctuation
 labels<span class="token operator">=</span>true_w<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token operator">*</span>features<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token operator">+</span>true_w<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">*</span>features<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">+</span>true_b <span class="token comment" spellcheck="true"># 真实值y（真实labels） 矢量计算</span>
 labels<span class="token operator">+=</span>torch<span class="token punctuation">.</span>from_numpy<span class="token punctuation">(</span>np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>normal<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0.01</span><span class="token punctuation">,</span>size<span class="token operator">=</span>labels<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 真实值（真实labels）y+噪声</span>
 </code></pre>
-<h3 id="Design-model-using-Class"><a href="#Design-model-using-Class" class="headerlink" title="Design model using Class"></a>Design model using Class</h3><p>python</p>
+<h3 id="Design-model-using-Class"><a href="#Design-model-using-Class" class="headerlink" title="Design model using Class"></a>Design model using Class</h3><p>  python</p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">LinearNet</span><span class="token punctuation">(</span>nn<span class="token punctuation">.</span>Module<span class="token punctuation">)</span><span class="token punctuation">:</span> 
     <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span>n_feature<span class="token punctuation">)</span><span class="token punctuation">:</span> 
         super<span class="token punctuation">(</span>LinearNet<span class="token punctuation">,</span>self<span class="token punctuation">)</span><span class="token punctuation">.</span>__init__<span class="token punctuation">(</span><span class="token punctuation">)</span> 
@@ -517,19 +518,19 @@ net<span class="token punctuation">.</span>add_module<span class="token punctuat
 <span class="token keyword">from</span> torch<span class="token punctuation">.</span>nn <span class="token keyword">import</span> init init<span class="token punctuation">.</span>normal_<span class="token punctuation">(</span>net<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>weight<span class="token punctuation">,</span>mean<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">,</span>std<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">)</span> 
 init<span class="token punctuation">.</span>constant_<span class="token punctuation">(</span>net<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>bias<span class="token punctuation">,</span>val<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
 </code></pre>
-<p>上述代码<code>y=self.linear(x)</code>无法理解</p>
+<p>  上述代码<code>y=self.linear(x)</code>无法理解</p>
 <h4 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h4><h5 id="查找官方文档"><a href="#查找官方文档" class="headerlink" title="查找官方文档"></a>查找官方文档</h5><pre class=" language-html"><code class="language-html">3.3.6. Emulating callable objects
 object.__call__(self[, args...]) 
 Called when the instance is “called” as a function; 
 if this method is defined, x(arg1, arg2, ...) roughly translates to type(x).__call__(x, arg1, ...).
 </code></pre>
-<p>上述意思是在类中添加<code>__call__</code>方法，来让类对象可调用</p>
+<p>  上述意思是在类中添加<code>__call__</code>方法，来让类对象可调用</p>
 <h5 id="查看Linear源码"><a href="#查看Linear源码" class="headerlink" title="查看Linear源码"></a>查看Linear源码</h5><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">_call_impl</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> <span class="token operator">*</span>input<span class="token punctuation">,</span> <span class="token operator">**</span>kwargs<span class="token punctuation">)</span><span class="token punctuation">:</span> 
     <span class="token comment" spellcheck="true"># Do not call functions when jit is used </span>
     full_backward_hooks<span class="token punctuation">,</span> non_full_backward_hooks <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span> 
     <span class="token keyword">if</span> len<span class="token punctuation">(</span>self<span class="token punctuation">.</span>_backward_hooks<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">or</span> len<span class="token punctuation">(</span>_global_backward_hooks<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">:</span> 
         full_backward_hooks<span class="token punctuation">,</span> non_full_backward_hooks <span class="token operator">=</span> self<span class="token punctuation">.</span>_get_backward_hooks<span class="token punctuation">(</span><span class="token punctuation">)</span> 
-        
+
     <span class="token keyword">for</span> hook <span class="token keyword">in</span> itertools<span class="token punctuation">.</span>chain<span class="token punctuation">(</span> 
             _global_forward_pre_hooks<span class="token punctuation">.</span>values<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> 
             self<span class="token punctuation">.</span>_forward_pre_hooks<span class="token punctuation">.</span>values<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span> 
@@ -551,7 +552,7 @@ if this method is defined, x(arg1, arg2, ...) roughly translates to type(x).__ca
             hook_result <span class="token operator">=</span> hook<span class="token punctuation">(</span>self<span class="token punctuation">,</span> input<span class="token punctuation">,</span> result<span class="token punctuation">)</span> 
             <span class="token keyword">if</span> hook_result <span class="token keyword">is</span> <span class="token operator">not</span> None<span class="token punctuation">:</span> 
                 result <span class="token operator">=</span> hook_result 
-            
+
         <span class="token keyword">if</span> bw_hook<span class="token punctuation">:</span> 
             result <span class="token operator">=</span> bw_hook<span class="token punctuation">.</span>setup_output_hook<span class="token punctuation">(</span>result<span class="token punctuation">)</span>
         <span class="token comment" spellcheck="true"># Handle the non-full backward hooks </span>
@@ -571,11 +572,11 @@ if this method is defined, x(arg1, arg2, ...) roughly translates to type(x).__ca
         <span class="token keyword">return</span> result 
 __call__ <span class="token punctuation">:</span> Callable<span class="token punctuation">[</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">,</span> Any<span class="token punctuation">]</span> <span class="token operator">=</span> _call_impl
 </code></pre>
-<h5 id="写个案例"><a href="#写个案例" class="headerlink" title="写个案例"></a>写个案例</h5><p>python</p>
+<h5 id="写个案例"><a href="#写个案例" class="headerlink" title="写个案例"></a>写个案例</h5><p>  <code>python</code></p>
 <pre class=" language-python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">Foobar</span><span class="token punctuation">:</span> 
     <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span> 
         <span class="token keyword">pass</span> 
-    
+
     <span class="token comment" spellcheck="true"># *args收前边没指定的参数 tuple </span>
     <span class="token comment" spellcheck="true"># kwargs 收后边指定的参数 dict </span>
     <span class="token keyword">def</span> <span class="token function">__call__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> <span class="token operator">*</span>args<span class="token punctuation">,</span> <span class="token operator">**</span>kwargs<span class="token punctuation">)</span><span class="token punctuation">:</span> 
@@ -584,7 +585,7 @@ __call__ <span class="token punctuation">:</span> Callable<span class="token pun
     f<span class="token operator">=</span>Foobar<span class="token punctuation">(</span><span class="token punctuation">)</span> 
     f<span class="token punctuation">(</span><span class="token string">"maozhongkuan"</span><span class="token punctuation">)</span>
 </code></pre>
-<p>输出</p>
+<p>  输出</p>
 <pre class=" language-python"><code class="language-python">hello maozhongkuan
 </code></pre>
 <h3 id="Construct-loss-and-optimizer"><a href="#Construct-loss-and-optimizer" class="headerlink" title="Construct loss and optimizer"></a>Construct loss and optimizer</h3><pre class=" language-python"><code class="language-python">loss<span class="token operator">=</span>nn<span class="token punctuation">.</span>MSELoss<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 损失函数</span>
@@ -607,7 +608,6 @@ dense<span class="token operator">=</span>net<span class="token punctuation">[</
 </code></pre>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><blockquote>
 <p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1Y7411d7Ys?p=5">https://www.bilibili.com/video/BV1Y7411d7Ys?p=5</a> 35min</p>
-</blockquote>
 </blockquote>
 
                 
@@ -635,7 +635,7 @@ dense<span class="token operator">=</span>net<span class="token punctuation">[</
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://MttJelly.github.io/2023/11/17/python%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(1)/">https://MttJelly.github.io/2023/11/17/python%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(1)/</a>
+                    <a href="https://MttJelly.github.io/2023/11/17/PyTorch%E7%9A%84%E7%BB%A7%E6%89%BFLinearNet%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90/">https://MttJelly.github.io/2023/11/17/PyTorch%E7%9A%84%E7%BB%A7%E6%89%BFLinearNet%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -848,36 +848,50 @@ dense<span class="token operator">=</span>net<span class="token punctuation">[</
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2024/03/19/PyTorch%E7%9A%84%E7%BB%A7%E6%89%BFLinearNet%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90/">
+                <a href="/2023/11/17/PyTorch%E7%9A%84%E7%BB%A7%E6%89%BFLinearNet%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="">
+                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="PyTorch的继承LinearNet代码分析">
                         
-                        <span class="card-title"></span>
+                        <span class="card-title">PyTorch的继承LinearNet代码分析</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            
+                            代码的四个步骤
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2024-03-19
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-11-17
+                            </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            Mao Zhongkuan
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" class="post-category">
+                                    机器学习
+                                </a>
+                            
                             
                         </span>
                     </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">
+                        <span class="chip bg-color">机器学习</span>
+                    </a>
+                    
                 </div>
                 
             </div>
