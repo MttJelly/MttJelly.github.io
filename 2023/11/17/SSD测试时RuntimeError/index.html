@@ -4,8 +4,8 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Pytorch参数inplace详解, 毛中宽的博客">
-    <meta name="description" content="inplace=true作用">
+    <meta name="keywords" content="SSD测试时RuntimeError, 毛中宽的博客">
+    <meta name="description" content="non-static forward method is deprecated">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -17,7 +17,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Pytorch参数inplace详解 | 毛中宽的博客</title>
+    <title>SSD测试时RuntimeError | 毛中宽的博客</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
@@ -309,12 +309,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/2.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/0.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Pytorch参数inplace详解</h1>
+                    <h1 class="description center-align post-title">SSD测试时RuntimeError</h1>
                 </div>
             </div>
         </div>
@@ -455,7 +455,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2024-03-20
+                    2023-11-17
                 </div>
                 
 
@@ -476,21 +476,68 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>##官方文档</p>
-<p>Relu</p>
-<hr>
-<p>Applies the rectified linear unit function element-wise:</p>
-<hr>
-<p>Parameters</p>
-<ul>
-<li>inplace – can optionally do the operation in-place. Default: <code>False</code></li>
-</ul>
-<h2 id="解释inplace-x3D-True含义"><a href="#解释inplace-x3D-True含义" class="headerlink" title="解释inplace&#x3D;True含义"></a>解释inplace&#x3D;True含义</h2><h3 id="inplace-x3D-Flase的情况"><a href="#inplace-x3D-Flase的情况" class="headerlink" title="inplace&#x3D;Flase的情况"></a>inplace&#x3D;Flase的情况</h3><p><img src="./p1.png"></p>
-<p>上图的这种传递类似C语言的值传递，input丢进去之后，给形参复制了一份值，形参和实参不指向同一块地址。</p>
-<h3 id="inplace-x3D-True的情况"><a href="#inplace-x3D-True的情况" class="headerlink" title="inplace&#x3D;True的情况"></a>inplace&#x3D;True的情况</h3><p><img src="./p2.png"></p>
-<p>上图设置了inplace&#x3D;<code>True</code>这种情况之后，丢进去的input，类似C语言的地址传递，进去之后在计算的过程中直接作用于input，返回的output的地址也和input一致。</p>
-<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><blockquote>
-<p>(<a target="_blank" rel="noopener" href="https://blog.csdn.net/manmanking/article/details/104830822">https://blog.csdn.net/manmanking/article/details/104830822</a>)<br>官方文档 (<a target="_blank" rel="noopener" href="https://pytorch.org/docs/stable/generated/torch.nn.ReLU.html?highlight=relu#torch.nn.ReLU">https://pytorch.org/docs/stable/generated/torch.nn.ReLU.html?highlight=relu#torch.nn.ReLU</a>)</p>
+                <h2 id="问题提出"><a href="#问题提出" class="headerlink" title="问题提出"></a>问题提出</h2><pre class=" language-html"><code class="language-html">RuntimeError: Legacy autograd function with non-static forward method is deprecated
+</code></pre>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>Pytorch版本过高，源代码是要求低版本的Pytorch，当前版本要求的forward过程是静态的，所以要修改源代码</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><ol>
+<li>删除文件<code>detection.py</code>里的 <code>def __init__()</code>，然后再在<code>def forward()</code>方法前面加上<code>@staticmethod</code></li>
+<li>修改<code>def forward()</code>的前半部分，如下</li>
+</ol>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">forward</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> num_classes<span class="token punctuation">,</span> bkg_label<span class="token punctuation">,</span> top_k<span class="token punctuation">,</span> conf_thresh<span class="token punctuation">,</span> nms_thresh<span class="token punctuation">,</span> loc_data<span class="token punctuation">,</span> conf_data<span class="token punctuation">,</span> prior_data<span class="token punctuation">)</span><span class="token punctuation">:</span> 
+    <span class="token triple-quoted-string string">""" 
+    Args: 
+        loc_data: (tensor) Loc preds from loc layers 
+            Shape: [batch,num_priors*4] 
+        conf_data: (tensor) Shape: Conf preds from conf layers 
+            Shape: [batch*num_priors,num_classes] 
+        prior_data: (tensor) Prior boxes and variances from priorbox layers 
+            Shape: [1,num_priors,4] 
+    """</span> 
+    self<span class="token punctuation">.</span>num_classes <span class="token operator">=</span> num_classes 
+    self<span class="token punctuation">.</span>background_label <span class="token operator">=</span> bkg_label 
+    self<span class="token punctuation">.</span>top_k <span class="token operator">=</span> top_k 
+    <span class="token comment" spellcheck="true"># Parameters used in nms. </span>
+    self<span class="token punctuation">.</span>nms_thresh <span class="token operator">=</span> nms_thresh 
+    <span class="token keyword">if</span> nms_thresh <span class="token operator">&lt;=</span> <span class="token number">0</span><span class="token punctuation">:</span> 
+        <span class="token keyword">raise</span> ValueError<span class="token punctuation">(</span><span class="token string">'nms_threshold must be non negative.'</span><span class="token punctuation">)</span> 
+    self<span class="token punctuation">.</span>conf_thresh <span class="token operator">=</span> conf_thresh 
+    self<span class="token punctuation">.</span>variance <span class="token operator">=</span> cfg<span class="token punctuation">[</span><span class="token string">'variance'</span><span class="token punctuation">]</span>
+</code></pre>
+<ol start="3">
+<li>因为上述<code>detect</code>类发生了变化，所以在使用该类的时候需要改变，所以修改<code>ssd.py</code>中的初始化方法<code>def __init__()</code>改成如下</li>
+</ol>
+<pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 修改前 </span>
+<span class="token keyword">if</span> phase <span class="token operator">==</span> <span class="token string">'test'</span><span class="token punctuation">:</span> 
+    self<span class="token punctuation">.</span>softmax <span class="token operator">=</span> nn<span class="token punctuation">.</span>Softmax<span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> 
+    self<span class="token punctuation">.</span>detect <span class="token operator">=</span> Detect<span class="token punctuation">(</span>num_classes<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">200</span><span class="token punctuation">,</span> <span class="token number">0.01</span><span class="token punctuation">,</span> <span class="token number">0.45</span><span class="token punctuation">)</span> 
+    
+<span class="token comment" spellcheck="true"># 修改后 </span>
+<span class="token keyword">if</span> phase <span class="token operator">==</span> <span class="token string">'test'</span><span class="token punctuation">:</span> 
+    self<span class="token punctuation">.</span>softmax <span class="token operator">=</span> nn<span class="token punctuation">.</span>Softmax<span class="token punctuation">(</span><span class="token punctuation">)</span> 
+    self<span class="token punctuation">.</span>detect <span class="token operator">=</span> Detect<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<ol start="4">
+<li>另外<code>ssd.py</code>文件下的<code>def forward()</code>方法也要改</li>
+</ol>
+<p>python</p>
+<pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 修改前 </span>
+<span class="token keyword">if</span> self<span class="token punctuation">.</span>phase <span class="token operator">==</span> <span class="token string">"test"</span><span class="token punctuation">:</span> 
+    output <span class="token operator">=</span> self<span class="token punctuation">.</span>detect<span class="token punctuation">(</span> 
+        loc<span class="token punctuation">.</span>view<span class="token punctuation">(</span>loc<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true"># loc preds </span>
+        self<span class="token punctuation">.</span>softmax<span class="token punctuation">(</span>conf<span class="token punctuation">.</span>view<span class="token punctuation">(</span>conf<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> 
+        self<span class="token punctuation">.</span>num_classes<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true"># conf preds </span>
+        self<span class="token punctuation">.</span>priors<span class="token punctuation">.</span>type<span class="token punctuation">(</span>type<span class="token punctuation">(</span>x<span class="token punctuation">.</span>data<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># default boxes </span>
+        <span class="token punctuation">)</span> 
+<span class="token comment" spellcheck="true"># 修改后 </span>
+<span class="token keyword">if</span> self<span class="token punctuation">.</span>phase <span class="token operator">==</span> <span class="token string">"test"</span><span class="token punctuation">:</span> 
+    output <span class="token operator">=</span> self<span class="token punctuation">.</span>detect<span class="token punctuation">.</span>apply<span class="token punctuation">(</span><span class="token number">21</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">200</span><span class="token punctuation">,</span> <span class="token number">0.01</span><span class="token punctuation">,</span> <span class="token number">0.45</span><span class="token punctuation">,</span> 
+    loc<span class="token punctuation">.</span>view<span class="token punctuation">(</span>loc<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true"># loc preds </span>
+    self<span class="token punctuation">.</span>softmax<span class="token punctuation">(</span>conf<span class="token punctuation">.</span>view<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">21</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true"># conf preds </span>
+    self<span class="token punctuation">.</span>priors<span class="token punctuation">.</span>type<span class="token punctuation">(</span>type<span class="token punctuation">(</span>x<span class="token punctuation">.</span>data<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># default boxes </span>
+    <span class="token punctuation">)</span>
+</code></pre>
+<h2 id="引用-amp-致谢"><a href="#引用-amp-致谢" class="headerlink" title="引用&amp;致谢"></a>引用&amp;致谢</h2><blockquote>
+<p>(<a target="_blank" rel="noopener" href="https://blog.csdn.net/baidu_39389949/article/details/107398256">https://blog.csdn.net/baidu_39389949/article/details/107398256</a>)<br>(<a target="_blank" rel="noopener" href="https://github.com/sayakbanerjee1999/Single-Shot-Object-Detection-Updated">https://github.com/sayakbanerjee1999/Single-Shot-Object-Detection-Updated</a>)</p>
 </blockquote>
 
                 
@@ -518,7 +565,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://MttJelly.github.io/2024/03/20/Pytorch%E5%8F%82%E6%95%B0inplace%E8%AF%A6%E8%A7%A3/">https://MttJelly.github.io/2024/03/20/Pytorch%E5%8F%82%E6%95%B0inplace%E8%AF%A6%E8%A7%A3/</a>
+                    <a href="https://MttJelly.github.io/2023/11/17/SSD%E6%B5%8B%E8%AF%95%E6%97%B6RuntimeError/">https://MttJelly.github.io/2023/11/17/SSD%E6%B5%8B%E8%AF%95%E6%97%B6RuntimeError/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -736,24 +783,24 @@
                 <i class="far fa-dot-circle"></i>&nbsp;本篇
             </div>
             <div class="card">
-                <a href="/2024/03/20/Pytorch%E5%8F%82%E6%95%B0inplace%E8%AF%A6%E8%A7%A3/">
+                <a href="/2023/11/17/SSD%E6%B5%8B%E8%AF%95%E6%97%B6RuntimeError/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="Pytorch参数inplace详解">
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="SSD测试时RuntimeError">
                         
-                        <span class="card-title">Pytorch参数inplace详解</span>
+                        <span class="card-title">SSD测试时RuntimeError</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            inplace=true作用
+                            non-static forward method is deprecated
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-03-20
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-11-17
                             </span>
                         <span class="publish-author">
                             
